@@ -1,0 +1,323 @@
+<template>
+  <div class="project-steps-board">
+    <message-error />
+    <message-success />
+    <div class="project-steps-header">
+      Project Steps
+    </div>
+    <table>
+      <thead>
+        <th>
+          <td class="project-column">Project</td>
+          <td class="year-column">Year</td>
+          <td class="quarter-column">Quarter</td>
+          <td class="start-at-column">Start at</td>
+          <td class="end-at-column">End at</td>
+          <td class="btn-column"></td>
+          <input type="button" class="add" @click.prevent="addProjectStep" />
+        </th>
+      </thead>
+      <tbody>
+        <tr v-for="project_step in project_steps" :key="project_step.id">
+          <td class="project-column">
+            <select v-model="project_step.project_id"  :ref="project_step.id">
+              <option
+                v-for="project in projects"
+                :key="project.id"
+                :value="project.id"
+                :selected="project.id == project_step.project_id ? 'selected' : ''"
+              >
+                {{project.name}}
+              </option>
+            </select>
+          </td>
+          <td class="year-column">
+            <input type="number" class="year" v-model="project_step.year"
+              onKeyDown="if (!isNaN(Number(event.key)) && this.value.length === 4) return false;"
+            >
+          </td>
+          <td class="quarter-column">
+            <select v-model="project_step.quarter">
+              <option
+                v-for="quarter in quarters"
+                :key="quarter"
+                :value="quarter"
+                :selected="quarter == project_step.quarter ? 'selected' : ''"
+              >
+                {{quarter}}
+              </option>
+            </select>
+          </td>
+          <td class="start-at-column">
+            <FunctionalCalendar
+              :is-date-picker="true"
+              :sundayStart="true"
+              :isModal="true"
+              :ref="`start_at_${project_step.id}`"
+              @choseDay="changeStartAt($event, project_step)"
+            ></FunctionalCalendar>
+          </td>
+          <td class="end-at-column">
+            <FunctionalCalendar
+              :is-date-picker="true"
+              :sundayStart="true"
+              :isModal="true"
+              :ref="`end_at_${project_step.id}`"
+              @choseDay="changeEndAt($event, project_step)"
+            ></FunctionalCalendar>
+          </td>
+          <td class="save-column">
+            <input v-if="project_step.saved" type="button" class="btn" @click="open(project_step)" value="Open" />
+            <input v-else type="button" class="btn" @click="save(project_step.id)" value="Save" />
+          </td>
+          <td class="remove-column">
+            <input
+              type="button"
+              class="btn-remove"
+              :class="{ 'btn-remove-disabled': !project_step.saved }"
+              @click.prevent="remove(project_step.id)"
+              value="x"
+            />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+  import moment from "moment";
+  import { api } from "../services.js";
+  import { mapState, mapActions } from "vuex";
+  import MessageError from "../components/MessageError.vue";
+  import MessageSuccess from "../components/MessageSuccess.vue";
+
+  export default {
+    name: "ProjectSteps",
+    components: {
+      MessageError,
+      MessageSuccess
+    },
+    data() {
+      return {
+        projects: null,
+        project_steps: null,
+        watchers: [],
+        quarters: ["Q1", "Q2", "Q3", "Q4"]
+      }
+    },
+    computed: mapState(["selectedStep"]),
+    methods: {
+      ...mapActions(["setShowMessageSuccess", "setShowMessageError", "setSelectedStep"]),
+      getProjects() {
+        api.get("projects").then(response => {
+          this.projects = response.data;
+        });
+      },
+      getProjectSteps() {
+        api.get("project_steps").then(response => {
+          const items = response.data.map(item => ({ ...item, saved: true }));
+          this.project_steps = items;
+          this.setProjectStepWatchers();
+        });
+      },
+      addProjectStep() {
+        this.removeProjectStepWatchers();
+        const date = new Date();
+        const id = date.getTime();
+        const start_at = moment(date, "YYYY-MM-DD");
+        const end_at = moment(date, "YYYY-MM-DD").add(7, 'days');
+
+        this.project_steps.push(
+          {
+            id: id,
+            project_id: this.projects[0].id,
+            year: date.getFullYear(),
+            quarter: 'Q1',
+            start_at: start_at,
+            end_at: end_at,
+            saved: false
+          }
+        );
+
+        this.$setFocusByRefId(this.$refs, id);
+        this.setProjectStepWatchers();
+      },
+      getProjectStep(id) {
+        return this.project_steps.find(project_step => project_step.id === id);
+      },
+      getProjectStepIndex(project) {
+        return this.project_steps.indexOf(project);
+      },
+      removeProjectStep(index) {
+        this.removeProjectStepWatchers();
+        this.project_steps.splice(index, 1);
+        this.setProjectStepWatchers();
+      },
+      open(project_step) {
+        this.setSelectedStep(project_step);
+        this.$router.push({ path: '/' });
+      },
+      save(id) {
+        const project_step = this.getProjectStep(id);
+
+        return api.post("project_steps/create_or_update", project_step).then((response) => {
+          if (response.data.status === "ok") {
+            this.setShowMessageSuccess(true);
+            project_step.id = response.data.id;
+            project_step.saved = true;
+          } else {
+            this.setShowMessageError({ show: true, text: response.data.error });
+          }
+        });
+      },
+      changeStartAt(calendar, project_step) {
+        project_step.start_at = moment(calendar.date, 'D/M/YYYY').format('YYYY-MM-DD');
+
+      },
+      remove(id) {
+        const project_step = this.getProjectStep(id);
+
+        if (!project_step.saved) {
+          return;
+        }
+
+        var result = confirm("Are you sure you want to remove?");
+
+        if (result === true) {
+          if (this.selectedStep != null && this.selectedStep.id == id) {
+            this.setSelectedStep(null);
+          }
+
+          api.delete(`/project_steps/${id}`).then(() => {
+            this.setShowMessageSuccess({ show: true, text: "Successfully removed." });
+            this.removeProjectStep(this.getProjectStepIndex(project_step));
+          });
+        }
+      },
+      setProjectStepWatchers() {
+        this.project_steps.forEach((project_step, index) => {
+          const keys = Object.keys(project_step).filter((key) => !['id', 'saved'].includes(key));
+
+          keys.forEach((key) => {
+            this.watchers.push(this.$watch(['project_steps', index, key].join('.'), () => {
+              project_step.saved = false;
+            }));
+          });
+        });
+      },
+      removeProjectStepWatchers() {
+        this.watchers.forEach((unwatch) => {
+          unwatch();
+        });
+
+        this.watchers = [];
+      },
+      changeEndAt(calendar, project_step) {
+        project_step.end_at = moment(calendar.date, 'D/M/YYYY').format('YYYY-MM-DD');
+      }
+    },
+    created() {
+      this.getProjects();
+      this.getProjectSteps();
+    },
+    updated() {
+      for (let i = 0; i < this.project_steps.length; i++) {
+        const project_step = this.project_steps[i];
+        const start_at_calendar = this.$refs[`start_at_${project_step.id}`][0].calendar;
+        const start_at = moment(project_step.start_at, 'YYYY-MM-DD').format('D/M/YYYY');
+        start_at_calendar.selectedDate = start_at;
+        const end_at_calendar = this.$refs[`end_at_${project_step.id}`][0].calendar;
+        const end_at = moment(project_step.end_at, 'YYYY-MM-DD').format('D/M/YYYY');
+        end_at_calendar.selectedDate = end_at;
+      }
+    }
+  }
+</script>
+
+<style scoped>
+  .project-steps-board {
+    display: flex;
+    flex-direction: column;
+    width: 1200px;
+    min-height: 750px;
+    padding: 15px 40px;
+    margin: 20px auto;
+    border: 1px solid rgba(0, 114, 255, 0.6);
+    box-shadow: 4px 4px 6px rgba(30, 60, 90, 0.1);
+    background-color: rgba(0, 114, 255, 0.1);
+  }
+
+  .project-steps-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 20px;
+    background-color: rgba(0, 114, 255, 0.8);
+    color: white;
+    border-radius: 4px;
+  }
+
+  table {
+    display: block;
+    margin-top: 15px;
+    padding-bottom: 5px;
+    width: 100%;
+    min-height: 640px;
+    border: 1px solid rgba(0, 114, 255, 0.3);
+  }
+
+  thead {
+    display: block;
+    height: 40px;
+    background-color: rgba(0, 114, 255, 0.6);
+    color: white;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    width: 100%;
+  }
+
+  .btn {
+    width: 100px;
+    margin-left: 10px;
+  }
+
+  .year {
+    width: 60px;
+  }
+
+  td {
+    text-align: left;
+  }
+
+  .project-column {
+    width: 580px;
+  }
+
+  .year-column {
+    width: 55px;
+  }
+
+  .quarter-column {
+    width: 80px;
+  }
+
+  .start-at-column, .end-at-column {
+    width: 110px;
+  }
+
+  .save-column {
+    width: 110px;
+  }
+
+  .remove-column {
+    width: 48px;
+  }
+
+  .add {
+    position: relative;
+    top: -32px;
+    right: -608px;
+  }
+</style>
