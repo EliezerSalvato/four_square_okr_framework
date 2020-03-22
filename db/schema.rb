@@ -45,6 +45,7 @@ ActiveRecord::Schema.define(version: 2020_02_29_163629) do
     t.bigint "project_step_id", null: false
     t.string "priority", null: false
     t.string "content", null: false
+    t.text "annotations"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["project_step_id"], name: "index_project_step_priorities_on_project_step_id"
