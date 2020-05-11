@@ -1,4 +1,6 @@
 class ProjectStep < ApplicationRecord
+  audited
+
   belongs_to :project
   has_many :priorities, class_name: 'ProjectStepPriority', dependent: :destroy
   has_many :confidences, class_name: 'ProjectStepConfidence', dependent: :destroy
