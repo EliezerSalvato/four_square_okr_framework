@@ -4,6 +4,7 @@
     @keyup.prevent="keyUp"
     :style="{ height: height + 'px' }"
     ref="textarea"
+    rows="1"
   ></textarea>
 </template>
 
@@ -22,14 +23,23 @@
       }
     },
     methods: {
+      adjustHeight() {
+        const textarea = this.$refs.textarea;
+        textarea.style.cssText = "height: auto;";
+        const scrollHeight = textarea.scrollHeight - 12;
+        const lines = Math.round(scrollHeight / 16);
+        const height = (lines == 1) ? this.height : (16 * lines + 12);
+        textarea.style.cssText = "height:" + height + "px";
+      },
       keyUp(event) {
-        const lines = event.target.value.split(/\r|\r\n|\n/).length;
-        const height = (lines == 1) ? 30 : (16 * lines + 12);
-        this.height = height;
+        this.adjustHeight();
       },
       focus() {
         this.$refs.textarea.focus();
       }
+    },
+    mounted() {
+      this.adjustHeight();
     }
   }
 </script>
