@@ -98,6 +98,7 @@
           this.selected = {
             id: project_step.id,
             project_id: project_step.project_id,
+            objective: project_step.objective,
             year: project_step.year,
             quarter: project_step.quarter,
             start_at: project_step.start_at,

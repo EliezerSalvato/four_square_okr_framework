@@ -5,83 +5,91 @@
     <div class="project-steps-header">
       Project Steps
     </div>
-    <table>
-      <thead>
-        <th>
-          <td class="project-column">Project</td>
-          <td class="year-column">Year</td>
-          <td class="quarter-column">Quarter</td>
-          <td class="start-at-column">Start at</td>
-          <td class="end-at-column">End at</td>
-          <td class="btn-column"></td>
-          <input type="button" class="add" @click.prevent="addProjectStep" />
-        </th>
-      </thead>
-      <tbody>
-        <tr v-for="project_step in project_steps" :key="project_step.id">
-          <td class="project-column">
-            <select v-model="project_step.project_id"  :ref="project_step.id">
-              <option
-                v-for="project in projects"
-                :key="project.id"
-                :value="project.id"
-                :selected="project.id == project_step.project_id ? 'selected' : ''"
+    <div class="project-steps-data">
+      <table>
+        <thead>
+          <tr>
+            <th class="project-th">Project</th>
+            <th class="objective-th">Objective</th>
+            <th class="year-th">Year</th>
+            <th class="quarter-th">Quarter</th>
+            <th class="start-at-th">Start at</th>
+            <th class="end-at-th">End at</th>
+            <th class="save-th"></th>
+            <th class="add-th">
+              <input type="button" class="add" @click.prevent="addProjectStep" />
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="project_step in project_steps" :key="project_step.id">
+            <td>
+              <select v-model="project_step.project_id"  :ref="project_step.id">
+                <option
+                  v-for="project in projects"
+                  :key="project.id"
+                  :value="project.id"
+                  :selected="project.id == project_step.project_id ? 'selected' : ''"
+                >
+                  {{project.name}}
+                </option>
+              </select>
+            </td>
+            <td>
+              <input type="text" class="objective" v-model="project_step.objective">
+            </td>
+            <td>
+              <input type="number" class="year" v-model="project_step.year"
+                onKeyDown="if (!isNaN(Number(event.key)) && this.value.length === 4) return false;"
               >
-                {{project.name}}
-              </option>
-            </select>
-          </td>
-          <td class="year-column">
-            <input type="number" class="year" v-model="project_step.year"
-              onKeyDown="if (!isNaN(Number(event.key)) && this.value.length === 4) return false;"
-            >
-          </td>
-          <td class="quarter-column">
-            <select v-model="project_step.quarter">
-              <option
-                v-for="quarter in quarters"
-                :key="quarter"
-                :value="quarter"
-                :selected="quarter == project_step.quarter ? 'selected' : ''"
-              >
-                {{quarter}}
-              </option>
-            </select>
-          </td>
-          <td class="start-at-column">
-            <FunctionalCalendar
-              :is-date-picker="true"
-              :sundayStart="true"
-              :isModal="true"
-              :ref="`start_at_${project_step.id}`"
-              @choseDay="changeStartAt($event, project_step)"
-            ></FunctionalCalendar>
-          </td>
-          <td class="end-at-column">
-            <FunctionalCalendar
-              :is-date-picker="true"
-              :sundayStart="true"
-              :isModal="true"
-              :ref="`end_at_${project_step.id}`"
-              @choseDay="changeEndAt($event, project_step)"
-            ></FunctionalCalendar>
-          </td>
-          <td class="save-column">
-            <input v-if="project_step.saved" type="button" class="btn" @click="open(project_step)" value="Open" />
-            <input v-else type="button" class="btn" @click="save(project_step.id)" value="Save" />
-          </td>
-          <td class="remove-column">
-            <input
-              type="button"
-              class="btn-remove"
-              :class="{ 'btn-remove-disabled': !project_step.saved }"
-              @click.prevent="remove(project_step.id)"
-              value="x"
-            />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td>
+              <select v-model="project_step.quarter">
+                <option
+                  v-for="quarter in quarters"
+                  :key="quarter"
+                  :value="quarter"
+                  :selected="quarter == project_step.quarter ? 'selected' : ''"
+                >
+                  {{quarter}}
+                </option>
+              </select>
+            </td>
+            <td>
+              <FunctionalCalendar
+                :is-date-picker="true"
+                :sundayStart="true"
+                :isModal="true"
+                :ref="`start_at_${project_step.id}`"
+                @choseDay="changeStartAt($event, project_step)"
+              ></FunctionalCalendar>
+            </td>
+            <td>
+              <FunctionalCalendar
+                :is-date-picker="true"
+                :sundayStart="true"
+                :isModal="true"
+                :ref="`end_at_${project_step.id}`"
+                @choseDay="changeEndAt($event, project_step)"
+              ></FunctionalCalendar>
+            </td>
+            <td>
+              <input v-if="project_step.saved" type="button" class="btn" @click="open(project_step)" value="Open" />
+              <input v-else type="button" class="btn" @click="save(project_step.id)" value="Save" />
+            </td>
+            <td class="remove-column">
+              <input
+                type="button"
+                class="btn-remove"
+                :class="{ 'btn-remove-disabled': !project_step.saved }"
+                @click.prevent="remove(project_step.id)"
+                value="x"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -258,66 +266,69 @@
     border-radius: 4px;
   }
 
-  table {
-    display: block;
+  .project-steps-data {
     margin-top: 15px;
-    padding-bottom: 5px;
-    width: 100%;
     min-height: 640px;
     border: 1px solid rgba(0, 114, 255, 0.3);
   }
 
+  table {
+    padding: 5px;
+    width: 100%;
+    border-spacing: 0;
+  }
+
   thead {
-    display: block;
     height: 40px;
     background-color: rgba(0, 114, 255, 0.6);
     color: white;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 5px;
-    width: 100%;
-  }
-
-  .btn {
-    width: 100px;
     margin-left: 10px;
-  }
-
-  .year {
-    width: 60px;
-  }
-
-  td {
+    width: 100%;
     text-align: left;
   }
 
-  .project-column {
-    width: 580px;
+  th {
+    padding-left: 5px;
+    padding-right: 5px;
   }
 
-  .year-column {
-    width: 55px;
+  tbody {
+    border: 1px solid rgba(0, 114, 255, 0.3);
   }
 
-  .quarter-column {
-    width: 80px;
+  .project-th {
+    width: 40%;
   }
 
-  .start-at-column, .end-at-column {
-    width: 110px;
+  .objective-th {
+    width: 60%;
   }
 
-  .save-column {
-    width: 110px;
+  .year-th {
+    min-width: 65px;
+    text-align: center;
+  }
+
+  .quarter-th {
+    width: 50px;
+    text-align: center;
+  }
+
+  .start-at-th, .end-at-th {
+    width: 100px;
+    text-align: center;
+  }
+
+  .save-th {
+    width: 100px;
+  }
+
+  .add-th {
+    min-width: 45px;
+    text-align: right;
   }
 
   .remove-column {
-    width: 48px;
-  }
-
-  .add {
-    position: relative;
-    top: -32px;
-    right: -608px;
+    text-align: right;
   }
 </style>

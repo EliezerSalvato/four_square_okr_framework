@@ -5,6 +5,9 @@
       <input type="button" class="add" @click.prevent="addItem()" />
     </div>
     <ul>
+      <li v-if="objective" class="objective">
+        <span>Objective:</span> {{ selectedStep && selectedStep.objective }}
+      </li>
       <li class="board-items" v-for="(item, index) in items" :key="item.id">
         <priorities-selector
           v-if="type === 'priorities'"
@@ -61,6 +64,10 @@
       title: {
         type: String,
         required: true
+      },
+      objective: {
+        type: Boolean,
+        default: false
       },
       refBoards: Object
     },
@@ -181,10 +188,19 @@
     display: flex;
     flex-direction: row;
     flex: 1;
-    margin-right: 5px
+    margin-right: 5px;
   }
 
   .add {
     margin-left: auto;
+  }
+
+  .objective {
+    margin: 5px;
+  }
+
+  .objective span {
+    color: white;
+    font-weight: bold;
   }
 </style>

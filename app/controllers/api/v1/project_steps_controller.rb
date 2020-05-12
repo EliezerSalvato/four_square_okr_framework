@@ -109,6 +109,7 @@ class Api::V1::ProjectStepsController < ApplicationController
   def project_step_params
     params.require(:project_step).permit(
       :project_id,
+      :objective,
       :year,
       :quarter,
       :start_at,

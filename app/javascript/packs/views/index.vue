@@ -16,6 +16,7 @@
           type="confidences"
           title="OKR Confidence"
           ref="confidences"
+          :objective="true"
         />
       </div>
       <div class="boards-bottom">
