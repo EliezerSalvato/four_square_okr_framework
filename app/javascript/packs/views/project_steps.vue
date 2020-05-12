@@ -264,6 +264,7 @@
     background-color: rgba(0, 114, 255, 0.8);
     color: white;
     border-radius: 4px;
+    font-weight: bold;
   }
 
   .project-steps-data {
@@ -290,10 +291,6 @@
   th {
     padding-left: 5px;
     padding-right: 5px;
-  }
-
-  tbody {
-    border: 1px solid rgba(0, 114, 255, 0.3);
   }
 
   .project-th {
