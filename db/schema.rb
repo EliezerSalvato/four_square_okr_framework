@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_12_122736) do
+ActiveRecord::Schema.define(version: 2020_05_13_101953) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 2020_05_12_122736) do
     t.string "content", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "order", default: 0
     t.index ["project_step_id"], name: "index_project_step_confidences_on_project_step_id"
   end
 
@@ -52,6 +53,7 @@ ActiveRecord::Schema.define(version: 2020_05_12_122736) do
     t.string "content", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "order", default: 0
     t.index ["project_step_id"], name: "index_project_step_health_metrics_on_project_step_id"
   end
 
@@ -60,6 +62,7 @@ ActiveRecord::Schema.define(version: 2020_05_12_122736) do
     t.string "content", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "order", default: 0
     t.index ["project_step_id"], name: "index_project_step_next_projects_on_project_step_id"
   end
 
@@ -70,6 +73,7 @@ ActiveRecord::Schema.define(version: 2020_05_12_122736) do
     t.text "annotations"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "order", default: 0
     t.index ["project_step_id"], name: "index_project_step_priorities_on_project_step_id"
   end
 

@@ -81,25 +81,25 @@ class Api::V1::ProjectStepsController < ApplicationController
   end
 
   def priorities
-    project_step_priorities = ProjectStep.find(params[:id]).priorities.order(:priority, :content)
+    project_step_priorities = ProjectStep.find(params[:id]).priorities.order(:order)
 
     render json: project_step_priorities.to_json
   end
 
   def confidences
-    project_step_priorities = ProjectStep.find(params[:id]).confidences.order(:confidence, :content)
+    project_step_priorities = ProjectStep.find(params[:id]).confidences.order(:order)
 
     render json: project_step_priorities.to_json
   end
 
   def next_projects
-    project_step_priorities = ProjectStep.find(params[:id]).next_projects.order(:content)
+    project_step_priorities = ProjectStep.find(params[:id]).next_projects.order(:order)
 
     render json: project_step_priorities.to_json
   end
 
   def health_metrics
-    project_step_priorities = ProjectStep.find(params[:id]).health_metrics.order(:content)
+    project_step_priorities = ProjectStep.find(params[:id]).health_metrics.order(:order)
 
     render json: project_step_priorities.to_json
   end
@@ -115,16 +115,16 @@ class Api::V1::ProjectStepsController < ApplicationController
       :start_at,
       :end_at,
       priorities_attributes: [
-        :id, :project_step_id, :priority, :content, :annotations
+        :id, :project_step_id, :order, :priority, :content, :annotations
       ],
       confidences_attributes: [
-        :id, :project_step_id, :confidence, :content
+        :id, :project_step_id, :order, :confidence, :content
       ],
       next_projects_attributes: [
-        :id, :project_step_id, :content
+        :id, :project_step_id, :order, :content
       ],
       health_metrics_attributes: [
-        :id, :project_step_id, :health, :content
+        :id, :project_step_id, :order, :health, :content
       ]
     )
   end
