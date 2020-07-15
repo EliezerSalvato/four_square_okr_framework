@@ -97,6 +97,7 @@
     background-color: #dc3545;
     color: white;
     border: none;
+    cursor: pointer;
   }
 
   .btn-remove:hover {

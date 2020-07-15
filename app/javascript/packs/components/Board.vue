@@ -5,38 +5,43 @@
       <input type="button" class="add" @click.prevent="addItem()" />
     </div>
     <ul>
-      <li class="board-items" v-for="(item, index) in items" :key="item.id">
-        <priorities-selector
-          v-if="type === 'priorities'"
-          :item="item"
-          :currentDisplayedId="currentDisplayedId"
-          @update:displayedId="currentDisplayedId = $event"
-        />
-        <annotations-selector
-          v-if="type === 'priorities'"
-          :item="item"
-          :currentDisplayedId="currentDisplayedId"
-          @update:displayedId="currentDisplayedId = $event"
-        />
-        <confidence-selector
-          v-if="type === 'confidences'"
-          :item="item"
-        />
-        <add-priority-selector
-          v-if="type === 'next_projects'"
-          :item="item"
-          :refPriorities="refBoards.priorities"
-          @remove:next_project="removeItem(getIndex($event))"
-        />
-        <health-selector
-          v-if="type === 'health_metrics'"
-          :item="item"
-          :currentDisplayedId="currentDisplayedId"
-          @update:displayedId="currentDisplayedId = $event"
-        />
-        <dynamic-textarea :item="item" :ref="item.itemId" />
-        <input type="button" class="remove" @click.prevent="removeItem(index)" />
+      <li v-if="objective" class="objective">
+        <span>Objective:</span> {{ selectedStep && selectedStep.objective }}
       </li>
+      <Draggable v-model="items" :group="type" @end="reorder">
+        <li class="board-items" v-for="(item, index) in items" :key="item.id">
+          <priorities-selector
+            v-if="type === 'priorities'"
+            :item="item"
+            :currentDisplayedId="currentDisplayedId"
+            @update:displayedId="currentDisplayedId = $event"
+          />
+          <annotations-selector
+            v-if="type === 'priorities'"
+            :item="item"
+            :currentDisplayedId="currentDisplayedId"
+            @update:displayedId="currentDisplayedId = $event"
+          />
+          <confidence-selector
+            v-if="type === 'confidences'"
+            :item="item"
+          />
+          <add-priority-selector
+            v-if="type === 'next_projects'"
+            :item="item"
+            :refPriorities="refBoards.priorities"
+            @remove:next_project="removeItem(getIndex($event))"
+          />
+          <health-selector
+            v-if="type === 'health_metrics'"
+            :item="item"
+            :currentDisplayedId="currentDisplayedId"
+            @update:displayedId="currentDisplayedId = $event"
+          />
+          <dynamic-textarea :item="item" :ref="item.itemId" />
+          <input type="button" class="remove" @click.prevent="removeItem(index)" />
+        </li>
+      </Draggable>
     </ul>
   </div>
 </template>
@@ -44,6 +49,7 @@
 <script>
   import { api } from "../services.js";
   import { mapState, mapActions } from "vuex";
+  import Draggable from 'vuedraggable';
   import PrioritiesSelector from "../components/PrioritiesSelector.vue";
   import AnnotationsSelector from "../components/AnnotationsSelector.vue";
   import ConfidenceSelector from "../components/ConfidenceSelector.vue";
@@ -62,6 +68,10 @@
         type: String,
         required: true
       },
+      objective: {
+        type: Boolean,
+        default: false
+      },
       refBoards: Object
     },
     components: {
@@ -70,7 +80,8 @@
       ConfidenceSelector,
       AddPrioritySelector,
       HealthSelector,
-      DynamicTextarea
+      DynamicTextarea,
+      Draggable
     },
     data() {
       return {
@@ -106,12 +117,18 @@
 
         this.items.push(item);
         this.$setFocusByRefId(this.$refs, itemId);
+        this.reorder();
       },
       getIndex(item) {
         return this.items.indexOf(item);
       },
       removeItem(index) {
         this.items.splice(index, 1);
+        this.reorder();
+      },
+      reorder() {
+        const items = this.items.map((item, index) => ({ ...item, order: index }));
+        this.items = items;
       }
     },
     watch: {
@@ -181,10 +198,19 @@
     display: flex;
     flex-direction: row;
     flex: 1;
-    margin-right: 5px
+    margin-right: 5px;
   }
 
   .add {
     margin-left: auto;
+  }
+
+  .objective {
+    margin: 5px;
+  }
+
+  .objective span {
+    color: white;
+    font-weight: bold;
   }
 </style>

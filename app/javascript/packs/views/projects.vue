@@ -5,37 +5,44 @@
     <div class="projects-header">
       Projects
     </div>
-    <table>
-      <thead>
-        <th>Name</th>
-        <input type="button" class="add" @click.prevent="addProject" />
-      </thead>
-      <tbody>
-        <tr v-for="project in projects" :key="project.id">
-          <td class="name-column">
-            <input type="text" v-model="project.name" :ref="project.id">
-          </td>
-          <td>
-            <input
-              type="button"
-              class="btn"
-              :class="{ 'btn-disabled': project.saved }"
-              @click.prevent="save(project.id)"
-              value="Save"
-            />
-          </td>
-          <td>
-            <input
-              type="button"
-              class="btn-remove"
-              :class="{ 'btn-remove-disabled': !project.saved }"
-              @click.prevent="remove(project.id)"
-              value="x"
-            />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="projects-data">
+      <table>
+        <thead>
+          <tr>
+            <th class="name-th">Name</th>
+            <th class="save-th"></th>
+            <th class="add-th">
+              <input type="button" class="add" @click.prevent="addProject" />
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="project in projects" :key="project.id">
+            <td>
+              <input type="text" v-model="project.name" :ref="project.id">
+            </td>
+            <td>
+              <input
+                type="button"
+                class="btn save"
+                :class="{ 'btn-disabled': project.saved }"
+                @click.prevent="save(project.id)"
+                value="Save"
+              />
+            </td>
+            <td class="remove-column">
+              <input
+                type="button"
+                class="btn-remove"
+                :class="{ 'btn-remove-disabled': !project.saved }"
+                @click.prevent="remove(project.id)"
+                value="x"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -160,44 +167,49 @@
     background-color: rgba(0, 114, 255, 0.8);
     color: white;
     border-radius: 4px;
+    font-weight: bold;
   }
 
-  .add {
-    position: relative;
-    top: -32px;
-    right: -1070px;
-  }
-
-  table {
-    display: block;
+  .projects-data {
     margin-top: 15px;
-    padding-bottom: 5px;
-    width: 100%;
     min-height: 640px;
     border: 1px solid rgba(0, 114, 255, 0.3);
   }
 
+  table {
+    padding: 5px;
+    width: 100%;
+    border-spacing: 0;
+  }
+
   thead {
-    display: block;
     height: 40px;
     background-color: rgba(0, 114, 255, 0.6);
     color: white;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 5px;
+    margin-left: 10px;
     width: 100%;
-  }
-
-  td {
     text-align: left;
   }
 
-  .name-column {
-    width: 948px;
+  th {
+    padding-left: 5px;
+    padding-right: 5px;
   }
 
-  .btn {
-    width: 100px;
-    margin-left: 10px;
+  .name-th {
+    width: 100%;
+  }
+
+  .save-th {
+    min-width: 100px;
+  }
+
+  .add-th {
+    min-width: 45px;
+    text-align: right;
+  }
+
+  .remove-column {
+    text-align: right;
   }
 </style>
