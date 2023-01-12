@@ -1,6 +1,9 @@
 class Api::V1::ProjectStepsController < ApplicationController
+  include Paginable
+  
   def index
-    render json: ProjectStep.order(start_at: :desc).to_json
+    project_steps = ProjectStep.page(current_page).per(per_page).order(start_at: :desc)
+    render json: { items: project_steps, data_items: meta_attributes(project_steps) }.to_json
   end
 
   def create_or_update
