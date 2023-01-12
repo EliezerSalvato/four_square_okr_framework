@@ -25,7 +25,7 @@
 </script>
 
 <style>
-  * {
+* {
     box-sizing: border-box;
   }
 
@@ -230,4 +230,72 @@
     padding: 50px;
     border-radius: 4px;
   }
+
+    .pagination {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      padding-left: 0;
+      list-style: none;
+      border-radius: 0.25rem;
+    }
+  
+    .pagination>li {
+      display: inline;
+      cursor: pointer;
+    }
+  
+    .pagination>li:first-child>a,
+    .pagination>li:first-child>span {
+      margin-left: 0;
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+  
+    .pagination>li>a,
+    .pagination>li>span {
+      position: relative;
+      float: left;
+      padding: 6px 12px;
+      margin-left: -1px;
+      line-height: 1.42857143;
+      color: #337ab7;
+      text-decoration: none;
+      background-color: #fff;
+      border: 1px solid #ddd;
+    }
+  
+    .pagination>li>a:focus,
+    .pagination>li>a:hover,
+    .pagination>li>span:focus,
+    .pagination>li>span:hover {
+      z-index: 2;
+      color: #23527c;
+      background-color: #eee;
+      border-color: #ddd;
+    }
+  
+    .pagination>.active>a,
+    .pagination>.active>a:focus,
+    .pagination>.active>a:hover,
+    .pagination>.active>span,
+    .pagination>.active>span:focus,
+    .pagination>.active>span:hover {
+      z-index: 3;
+      color: #fff;
+      cursor: default;
+      background-color: #337ab7;
+      border-color: #337ab7;
+    }
+  
+    .pagination-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 30px 0;
+    }
+  
+    .VuePagination__count {
+      text-align: center;
+      padding: 10px 0;
+    }
 </style>

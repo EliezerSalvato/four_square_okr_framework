@@ -89,6 +89,9 @@
           </tr>
         </tbody>
       </table>
+      <div id="pagination" v-cloak class="pagination-wrapper">
+        <pagination v-model="page" :records=totalItems :per-page=perPage @paginate="getProjectSteps" />
+      </div>
     </div>
   </div>
 </template>
@@ -99,19 +102,24 @@
   import { mapState, mapActions } from "vuex";
   import MessageError from "../components/MessageError.vue";
   import MessageSuccess from "../components/MessageSuccess.vue";
+  import Pagination from 'vue-pagination-2';
 
   export default {
     name: "ProjectSteps",
     components: {
       MessageError,
-      MessageSuccess
+      MessageSuccess,
+      Pagination
     },
     data() {
       return {
         projects: null,
         project_steps: null,
         watchers: [],
-        quarters: ["Q1", "Q2", "Q3", "Q4"]
+        quarters: ["Q1", "Q2", "Q3", "Q4"],
+        page: 1,
+        totalItems: 0,
+        perPage: 20
       }
     },
     computed: mapState(["selectedStep"]),
@@ -122,10 +130,12 @@
           this.projects = response.data;
         });
       },
-      getProjectSteps() {
-        api.get("project_steps").then(response => {
-          const items = response.data.map(item => ({ ...item, saved: true }));
+      getProjectSteps(page = 1) {
+        const url = `project_steps?page=${page}&per_page=${this.perPage}`;
+        api.get(url).then(response => {
+          const items = response.data.items.map(item => ({ ...item, saved: true }));
           this.project_steps = items;
+          this.totalItems = response.data.data_items.total;
           this.setProjectStepWatchers();
         });
       },
